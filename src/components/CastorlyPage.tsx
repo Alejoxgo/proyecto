@@ -1,3 +1,4 @@
+import TC from "@/components/TC";
 import Link from "next/link";
 import { Fragment } from "react";
 import type { Product } from "@prisma/client";
@@ -54,7 +55,7 @@ export default function CastorlyPage({ p, s }: { p: Product; s: Settings }) {
   const slides = parseGallery(s["castorly.gallery"]);
 
   return (
-    <div className="castorly-scope font-castorly">
+    <div className="castorly-scope keep-light font-castorly">
       {/* Portada */}
       <section
         className="relative overflow-hidden text-white"
@@ -66,8 +67,7 @@ export default function CastorlyPage({ p, s }: { p: Product; s: Settings }) {
       >
         <div className="container-x relative grid items-center gap-14 pb-24 pt-14 sm:pt-20 lg:grid-cols-12">
           <div className="lg:col-span-6">
-            <Link href="/#productos" className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs text-[#c9d3ff] hover:bg-white/10">
-              ← Un producto de <span className="font-semibold text-white">aldore</span>
+            <Link href="/#productos" className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs text-[#c9d3ff] hover:bg-white/10"><TC>{"← Un producto de "}</TC><span className="font-semibold text-white"><TC>{"aldore"}</TC></span>
             </Link>
             <div className="mt-10 flex items-center gap-4">
               <CastorlyMark className="h-14 w-14 sm:h-16 sm:w-16" />
@@ -92,9 +92,7 @@ export default function CastorlyPage({ p, s }: { p: Product; s: Settings }) {
                   {p.ctaLabel} ↗
                 </a>
               ) : null}
-              <a href="#solicitar" className="inline-flex items-center gap-2 rounded-full border border-white/25 px-6 py-3 font-semibold text-white transition hover:bg-white/10">
-                Hablar con un asesor
-              </a>
+              <a href="#solicitar" className="inline-flex items-center gap-2 rounded-full border border-white/25 px-6 py-3 font-semibold text-white transition hover:bg-white/10"><TC>{"Hablar con un asesor"}</TC></a>
             </div>
             {p.price && (
               <p className="mt-6 text-sm text-[#c9d3ff]">
@@ -111,7 +109,7 @@ export default function CastorlyPage({ p, s }: { p: Product; s: Settings }) {
             )}
             {mascot && (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={mascot} alt={mascotName} className="castor-bob pointer-events-none absolute -bottom-12 -left-4 w-28 drop-shadow-2xl sm:-left-10 sm:w-40" />
+              <img src={mascot} alt={mascotName} className="pointer-events-none absolute -bottom-12 -left-4 w-28 drop-shadow-2xl sm:-left-10 sm:w-40" />
             )}
           </div>
         </div>
@@ -133,7 +131,7 @@ export default function CastorlyPage({ p, s }: { p: Product; s: Settings }) {
       <section style={{ background: C.mist, color: C.navy }} className="py-20 sm:py-24">
         <div className="container-x grid grid-cols-1 gap-12 lg:grid-cols-12">
           <div className="lg:col-span-5">
-            <p className="text-sm font-semibold uppercase tracking-wider" style={{ color: C.blue }}>Qué hace {p.name}</p>
+            <p className="text-sm font-semibold uppercase tracking-wider" style={{ color: C.blue }}><TC>{"Qué hace "}</TC>{p.name}</p>
             <div className="mt-4 space-y-5 text-lg leading-relaxed text-[#3a4673]">
               {paragraphs(p.description).map((t, i) => <p key={i}>{t}</p>)}
             </div>
@@ -142,8 +140,7 @@ export default function CastorlyPage({ p, s }: { p: Product; s: Settings }) {
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={mascot} alt="" className="h-16 w-16 shrink-0 object-contain" />
                 <p className="text-[15px] text-[#3a4673]">
-                  <span className="font-bold" style={{ color: C.navy }}>Hola, soy {mascotName}.</span> Te acompaño en cada caso: busco en tu base de conocimiento, te propongo el ticket y te aviso si algo falta.
-                </p>
+                  <span className="font-bold" style={{ color: C.navy }}><TC>{"Hola, soy "}</TC>{mascotName}.</span><TC>{" Te acompaño en cada caso: busco en tu base de conocimiento, te propongo el ticket y te aviso si algo falta."}</TC></p>
               </div>
             )}
           </div>
@@ -171,10 +168,8 @@ export default function CastorlyPage({ p, s }: { p: Product; s: Settings }) {
           <div className="grid grid-cols-1 gap-10 rounded-3xl bg-white p-6 shadow-xl shadow-[#2160F0]/10 ring-1 ring-[#2160F0]/10 sm:p-10 lg:grid-cols-12">
             <div className="lg:col-span-5">
               <CastorlyMark className="h-12 w-12" />
-              <h2 className="mt-5 text-3xl font-extrabold tracking-tight sm:text-4xl" style={{ color: C.navy }}>
-                ¿Quieres {p.name} en tu mesa de ayuda?
-              </h2>
-              <p className="mt-4 text-lg text-[#3a4673]">Cuéntanos de tu equipo y te mostramos {p.name} funcionando con tus propios casos.</p>
+              <h2 className="mt-5 text-3xl font-extrabold tracking-tight sm:text-4xl" style={{ color: C.navy }}><TC>{"¿Quieres "}</TC>{p.name}<TC>{" en tu mesa de ayuda?"}</TC></h2>
+              <p className="mt-4 text-lg text-[#3a4673]"><TC>{"Cuéntanos de tu equipo y te mostramos "}</TC>{p.name}<TC>{" funcionando con tus propios casos."}</TC></p>
               {p.ctaUrl && (
                 <a href={p.ctaUrl} target="_blank" rel="noopener noreferrer" className="mt-6 inline-flex font-semibold hover:underline" style={{ color: C.blue }}>
                   {s["castorly.urlLabel"] || "Ir a castorly.co"} ↗

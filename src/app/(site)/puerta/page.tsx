@@ -1,10 +1,11 @@
+import TC from "@/components/TC";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { getSettings } from "@/lib/settings";
 import { lines } from "@/lib/utils";
 import { Emph } from "@/components/Sections";
 import ContactForm from "@/components/ContactForm";
-import { PuertaPhone, parsePlans } from "@/components/PuertaSections";
+import { PuertaPhone, PuertaShowcase, parsePlans } from "@/components/PuertaSections";
 
 export const metadata: Metadata = {
   title: "Puerta: tu negocio a un toque (QR y NFC)",
@@ -31,7 +32,7 @@ export default async function PuertaLanding() {
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-paper/70">{s["puerta.text"]}</p>
             <div className="mt-9 flex flex-wrap gap-3">
               <a href="#pedir" className="btn-signal">{s["puerta.cta"]} →</a>
-              {s["puerta.demo"] && <a href={s["puerta.demo"]} target="_blank" className="btn-ghost text-paper">Ver demo en vivo ↗</a>}
+              {s["puerta.demo"] && <a href={s["puerta.demo"]} target="_blank" className="btn-ghost text-paper"><TC>{"Ver demo en vivo ↗"}</TC></a>}
             </div>
           </div>
           <div className="lg:col-span-6">
@@ -40,10 +41,12 @@ export default async function PuertaLanding() {
         </div>
       </section>
 
+      <PuertaShowcase />
+
       {steps.length > 0 && (
         <section className="border-b border-paper-line py-20">
           <div className="container-x">
-            <p className="eyebrow">Cómo funciona</p>
+            <p className="eyebrow"><TC>{"Cómo funciona"}</TC></p>
             <ol className="mt-8 grid grid-cols-1 gap-px overflow-hidden rounded-xl border border-paper-line bg-paper-line md:grid-cols-3">
               {steps.map((st, i) => (
                 <li key={st.t} className="bg-paper p-7">
@@ -55,7 +58,7 @@ export default async function PuertaLanding() {
             </ol>
             {uses.length > 0 && (
               <div className="mt-12 flex flex-wrap items-center gap-2">
-                <span className="eyebrow mr-2">Ideal para</span>
+                <span className="eyebrow mr-2"><TC>{"Ideal para"}</TC></span>
                 {uses.map((u) => <span key={u} className="rounded-full border border-paper-line bg-white px-3 py-1 text-sm text-ink-700">{u}</span>)}
               </div>
             )}
@@ -66,8 +69,8 @@ export default async function PuertaLanding() {
       {plans.length > 0 && (
         <section id="planes" className="scroll-mt-16 border-b border-paper-line py-20">
           <div className="container-x">
-            <p className="eyebrow">Planes</p>
-            <h2 className="section-title mt-4">Elige cómo abrir tu <span className="text-brand-500">Puerta</span></h2>
+            <p className="eyebrow"><TC>{"Planes"}</TC></p>
+            <h2 className="section-title mt-4"><TC>{"Elige cómo abrir tu "}</TC><span className="text-brand-500"><TC>{"Puerta"}</TC></span></h2>
             <div className="mt-10 grid grid-cols-1 gap-5 md:grid-cols-3">
               {plans.map((p, i) => (
                 <div key={p.name} className={`flex min-w-0 flex-col rounded-2xl border p-7 ${i === 1 ? "border-ink-900 bg-ink-900 text-paper" : "border-paper-line bg-white"}`}>
@@ -91,9 +94,9 @@ export default async function PuertaLanding() {
       <section id="pedir" className="scroll-mt-16 bg-white/50 py-20">
         <div className="container-x grid grid-cols-1 gap-12 lg:grid-cols-12">
           <div className="lg:col-span-5">
-            <p className="eyebrow">Pídela</p>
-            <h2 className="section-title mt-4">Cuéntanos de tu negocio</h2>
-            <p className="mt-5 text-lg text-ink-700">Te enviamos una propuesta de tu Puerta en menos de 48 horas. ¿Dudas? <Link href="/contacto" className="link-u">Escríbenos</Link>.</p>
+            <p className="eyebrow"><TC>{"Pídela"}</TC></p>
+            <h2 className="section-title mt-4"><TC>{"Cuéntanos de tu negocio"}</TC></h2>
+            <p className="mt-5 text-lg text-ink-700"><TC>{"Te enviamos una propuesta de tu Puerta en menos de 48 horas. ¿Dudas? "}</TC><Link href="/contacto" className="link-u"><TC>{"Escríbenos"}</TC></Link>.</p>
           </div>
           <div className="lg:col-span-7">
             <ContactForm services={["Puerta (QR / NFC)", ...plans.map((p) => `Puerta – plan ${p.name}`)]} defaultService="Puerta (QR / NFC)" />

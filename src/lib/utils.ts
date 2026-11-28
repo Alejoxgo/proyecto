@@ -38,3 +38,11 @@ export function linkList(value: string | null | undefined): { label: string; hre
 }
 
 export const isExternal = (href: string) => /^https?:\/\//.test(href);
+
+/** Clave aleatoria para enlaces privados (portal del cliente, paneles de turnos y menú). */
+export function randomKey(len = 22) {
+  const abc = "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  const bytes = new Uint8Array(len);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, (b) => abc[b % abc.length]).join("");
+}

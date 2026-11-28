@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 320" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <pattern id="teja" width="80" height="40" patternUnits="userSpaceOnUse">
+      <path d="M0 40 Q20 8 40 40 Q60 8 80 40" fill="none" stroke="#C8693B" stroke-width="3" opacity=".55"/>
+      <path d="M-40 20 Q-20 -12 0 20 Q20 -12 40 20 Q60 -12 80 20 Q100 -12 120 20" fill="none" stroke="#C8693B" stroke-width="3" opacity=".35"/>
+    </pattern>
+    <linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1F5C45"/><stop offset="1" stop-color="#174635"/></linearGradient>
+    <g id="bean"><ellipse rx="14" ry="20" fill="#8A4B2A"/><path d="M0-18c-6 10 6 26 0 36" stroke="#5C2F18" stroke-width="3" fill="none"/></g>
+  </defs>
+  <rect width="800" height="320" fill="url(#g)"/>
+  <rect width="800" height="150" fill="url(#teja)"/>
+  <use href="#bean" transform="translate(120 230) rotate(-25)"/>
+  <use href="#bean" transform="translate(170 260) rotate(20) scale(.8)"/>
+  <use href="#bean" transform="translate(650 220) rotate(35)"/>
+  <use href="#bean" transform="translate(700 265) rotate(-15) scale(.75)"/>
+  <use href="#bean" transform="translate(610 285) rotate(70) scale(.6)"/>
+</svg>

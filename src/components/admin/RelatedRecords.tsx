@@ -5,7 +5,7 @@ import { money, shortDate } from "@/lib/format";
 
 function Box({ title, action, children }: { title: string; action?: React.ReactNode; children: React.ReactNode }) {
   return (
-    <section className="mt-8 overflow-hidden rounded-2xl border border-slate-200 bg-white">
+    <section className="mt-8 overflow-hidden rounded-2xl border border-black/[0.06] bg-white shadow-[0_1px_2px_rgba(0,0,0,.04)]">
       <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4">
         <h2 className="font-semibold text-ink-900">{title}</h2>
         {action}

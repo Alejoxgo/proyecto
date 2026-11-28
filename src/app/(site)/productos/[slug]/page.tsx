@@ -1,3 +1,4 @@
+import TC from "@/components/TC";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
@@ -29,7 +30,7 @@ export default async function ProductPage({ params }: Props) {
       <section className="bg-ink-900 text-paper">
         <div className="container-x grid items-end gap-10 pb-16 pt-14 sm:pt-20 lg:grid-cols-12">
           <div className="lg:col-span-8">
-            <Link href="/#productos" className="eyebrow !text-paper/50 hover:!text-paper">← Productos</Link>
+            <Link href="/#productos" className="eyebrow !text-paper/50 hover:!text-paper"><TC>{"← Productos"}</TC></Link>
             <h1 className="mt-10 font-display text-6xl font-medium tracking-tight sm:text-8xl">
               {p.name}<span className="text-brand-500">.</span>
             </h1>
@@ -46,7 +47,7 @@ export default async function ProductPage({ params }: Props) {
               {p.ctaUrl ? (
                 <>
                   <a href={p.ctaUrl} target="_blank" rel="noopener noreferrer" className="btn-signal">{p.ctaLabel} ↗</a>
-                  <a href="#solicitar" className="btn-ghost text-paper">Hablar con un asesor</a>
+                  <a href="#solicitar" className="btn-ghost text-paper"><TC>{"Hablar con un asesor"}</TC></a>
                 </>
               ) : (
                 <a href="#solicitar" className="btn-signal">{p.ctaLabel}</a>
@@ -68,7 +69,7 @@ export default async function ProductPage({ params }: Props) {
           </div>
           {feats.length > 0 && (
             <aside className="lg:col-span-4 lg:col-start-9">
-              <p className="eyebrow">Características</p>
+              <p className="eyebrow"><TC>{"Características"}</TC></p>
               <ul className="mt-4 border-t border-ink-900">
                 {feats.map((f) => (
                   <li key={f} className="flex gap-3 border-b border-paper-line py-3 text-[15px]">
@@ -82,7 +83,7 @@ export default async function ProductPage({ params }: Props) {
       </section>
       <section id="solicitar" className="scroll-mt-16 border-t border-paper-line bg-white/50 py-20">
         <div className="container-x grid grid-cols-1 gap-12 lg:grid-cols-12">
-          <h2 className="section-title lg:col-span-5">¿Quieres {p.name} en tu empresa?</h2>
+          <h2 className="section-title lg:col-span-5"><TC>{"¿Quieres "}</TC>{p.name}<TC>{" en tu empresa?"}</TC></h2>
           <div className="lg:col-span-7">
             <ContactForm services={[p.name]} defaultService={p.name} />
           </div>

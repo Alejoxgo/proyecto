@@ -1,8 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { loadAldo } from "@/lib/aldo-server";
+import { groqChat } from "@/lib/groq";
 
 const hits = new Map<string, { n: number; until: number }>();
-const MODEL = () => process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
 
 type ChatMsg = { role: "user" | "assistant"; content: string };
 
@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
   if (h && h.until > now && h.n >= 20) return NextResponse.json({ error: "limite" }, { status: 429 });
   hits.set(ip, h && h.until > now ? { n: h.n + 1, until: h.until } : { n: 1, until: now + 60_000 });
 
-  let body: { messages?: ChatMsg[] };
+  let body: { messages?: ChatMsg[]; lang?: string };
   try {
     body = await req.json();
   } catch {
@@ -30,13 +30,23 @@ export async function POST(req: NextRequest) {
   if (!messages.length || messages[messages.length - 1].role !== "user") return NextResponse.json({ error: "vacio" }, { status: 400 });
 
   const { s, knowledge: k } = await loadAldo();
+  // El idioma lo manda la página donde está la visita; si no llega, el de la cookie.
+  const lang = body.lang === "en" || body.lang === "pt" || body.lang === "es" ? body.lang : (k as { lang?: string }).lang || "es";
+  const LANG_RULE: Record<string, string> = {
+    es: "Responde SIEMPRE en español colombiano, aunque te escriban en otro idioma.",
+    en: "The visitor is on the ENGLISH version of the site. ALWAYS answer in natural English, even though the information below may be in Spanish. Translate names of services naturally.",
+    pt: "O visitante está na versão em PORTUGUÊS do site. Responda SEMPRE em português do Brasil natural, mesmo que as informações abaixo estejam em espanhol.",
+  };
   const catalog = k.topics
     .filter((t) => t.id !== "humano")
     .map((t) => `## ${t.label}${t.href ? ` (enlace: ${t.href})` : ""}\n${t.answer}${t.points?.length ? `\nIncluye: ${t.points.join("; ")}` : ""}${t.price ? `\nPrecio: ${t.price}` : ""}`)
     .join("\n\n");
   const faqs = k.faqs.map((f) => `- ${f.q} ${f.a}`).join("\n");
 
-  const system = `Eres Aldo, el búho asistente de ${s["site.name"]}, un estudio de software en Colombia. Hablas en español colombiano, cálido, cercano y directo, tuteando. Respuestas cortas: máximo 3 frases o una lista breve. Usa como mucho un emoji.
+  const system = `Eres Aldo, el búho asistente de ${s["site.name"]}, un estudio de software en Colombia. Tono cálido, cercano y directo, tuteando.
+
+IDIOMA: ${LANG_RULE[lang]}
+Respuestas cortas: máximo 3 frases o una lista breve. Usa como mucho un emoji.
 
 Reglas:
 - Responde SOLO con la información de abajo. Si no la tienes, dilo con honestidad y ofrece WhatsApp. No inventes precios, plazos, clientes ni datos.
@@ -50,20 +60,17 @@ Contacto: WhatsApp ${s["contact.whatsapp"]}, correo ${s["contact.email"]}, horar
 ${catalog}
 
 # Preguntas frecuentes
-${faqs}`;
+${faqs}
+
+${LANG_RULE[lang]}`;
 
   try {
-    const r = await fetch(process.env.GROQ_API_URL || "https://api.groq.com/openai/v1/chat/completions", {
-      method: "POST",
-      headers: { "content-type": "application/json", authorization: `Bearer ${key}` },
-      body: JSON.stringify({ model: MODEL(), temperature: 0.4, max_tokens: 350, messages: [{ role: "system", content: system }, ...messages] }),
-    });
+    const r = await groqChat({ temperature: 0.4, maxTokens: 350, timeoutMs: 25000, messages: [{ role: "system", content: system }, ...messages] });
     if (!r.ok) {
-      console.error("Groq respondió", r.status, (await r.text()).slice(0, 300));
+      console.error("Groq respondió", r.status, r.model, r.error);
       return NextResponse.json({ error: "groq" }, { status: 502 });
     }
-    const data = (await r.json()) as { choices?: { message?: { content?: string } }[] };
-    let text = data.choices?.[0]?.message?.content?.trim() ?? "";
+    let text = r.content;
     const wa = text.includes("[WHATSAPP]");
     const link = text.match(/\[LINK:([^\]\s]+)\]/)?.[1];
     text = text.replace(/\[WHATSAPP\]|\[LINK:[^\]]*\]/g, "").trim();

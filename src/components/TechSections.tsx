@@ -1,3 +1,4 @@
+import TC from "@/components/TC";
 import { LogoMark } from "./Logo";
 import { lines } from "@/lib/utils";
 import type { Settings } from "@/lib/settings";
@@ -40,13 +41,13 @@ export function IntegrationsDiagram({ s }: { s: Settings }) {
       <div className="tech-grid pointer-events-none absolute inset-0 opacity-60" />
       <div className="container-x relative grid grid-cols-1 items-center gap-12 lg:grid-cols-12">
         <div className="lg:col-span-4">
-          <p className="eyebrow !text-paper/50"><span className="text-brand-500">→</span> Integraciones</p>
+          <p className="eyebrow !text-paper/50"><span className="text-brand-500">→</span><TC>{" Integraciones"}</TC></p>
           <h2 className="mt-5 font-display text-4xl leading-[1.05] sm:text-5xl">{s["integrations.title"]}</h2>
           <p className="mt-5 text-lg leading-relaxed text-paper/65">{s["integrations.text"]}</p>
           <ul className="mt-8 space-y-2 font-mono text-sm text-paper/60">
-            <li><span className="text-brand-400">POST</span> /webhooks/pedido-creado</li>
-            <li><span className="text-emerald-400">200</span> factura emitida · 0.4 s</li>
-            <li><span className="text-brand-400">SYNC</span> inventario cada 5 min</li>
+            <li><span className="text-brand-400"><TC>{"POST"}</TC></span><TC>{" /webhooks/pedido-creado"}</TC></li>
+            <li><span className="text-emerald-400">200</span><TC>{" factura emitida · 0.4 s"}</TC></li>
+            <li><span className="text-brand-400"><TC>{"SYNC"}</TC></span><TC>{" inventario cada 5 min"}</TC></li>
           </ul>
         </div>
         <div className="lg:col-span-8">

@@ -37,3 +37,17 @@ export const DEMO_BUTTONS = [
   "wifi | Conéctate a nuestro WiFi | Toca para ver la clave | wifi",
   "pago | Métodos de pago | Nequi, Daviplata y tarjetas | https://aldore.co",
 ].join("\n");
+
+/** ¿Un color hexadecimal es oscuro? Sirve para elegir texto claro u oscuro encima. */
+export function isDark(hex: string) {
+  const m = hex.trim().replace("#", "");
+  const full = m.length === 3 ? m.split("").map((x) => x + x).join("") : m;
+  if (!/^[0-9a-f]{6}$/i.test(full)) return true;
+  const [r, g, b] = [0, 2, 4].map((i) => parseInt(full.slice(i, i + 2), 16) / 255);
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b < 0.55;
+}
+
+export function puertaBg(d: { bgColor?: string; theme: string }) {
+  return d.bgColor || (d.theme === "claro" ? "#f4f1ea" : "#16130f");
+}
+

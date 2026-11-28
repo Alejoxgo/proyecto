@@ -1,3 +1,4 @@
+import { requireAdmin } from "@/lib/auth";
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { LEAD_STATUSES, STATUS_STYLES } from "@/lib/leads";
@@ -6,6 +7,7 @@ import Flash from "@/components/admin/Flash";
 type Props = { searchParams: Promise<{ estado?: string; q?: string; ok?: string }> };
 
 export default async function LeadsPage({ searchParams }: Props) {
+  await requireAdmin();
   const { estado = "", q = "", ok } = await searchParams;
   const where = {
     ...(estado ? { status: estado } : {}),
@@ -20,7 +22,7 @@ export default async function LeadsPage({ searchParams }: Props) {
     <div>
       <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-ink-900">Solicitudes web</h1>
+          <h1 className="font-display text-3xl text-ink-900">Solicitudes web</h1>
           <p className="mt-1 text-sm text-slate-500">Mensajes recibidos desde los formularios del sitio.</p>
         </div>
         <a href="/api/admin/leads/export" className="btn-outline">Exportar CSV</a>
@@ -34,7 +36,7 @@ export default async function LeadsPage({ searchParams }: Props) {
         </select>
         <button className="btn-outline">Filtrar</button>
       </form>
-      <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white">
+      <div className="overflow-x-auto rounded-2xl border border-black/[0.06] bg-white shadow-[0_1px_2px_rgba(0,0,0,.04)]">
         <table className="w-full text-left text-sm">
           <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
             <tr>

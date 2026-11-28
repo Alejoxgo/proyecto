@@ -1,12 +1,31 @@
 "use client";
 import Link from "next/link";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import Logo from "./Logo";
+import type { Lang } from "@/lib/langs";
 
 type NavLink = { label: string; href: string };
 
 /** Botón de ingreso: la puerta de la marca, que se "abre" al pasar el mouse. */
-function LoginButton({ label, className = "", onClick }: { label: string; className?: string; onClick?: () => void }) {
+function LoginButton({ label, user, className = "", onClick }: { label: string; user?: string | null; className?: string; onClick?: () => void }) {
+  if (user) {
+    const first = user.trim().split(/\s+/)[0] || user;
+    return (
+      <Link
+        href="/admin"
+        onClick={onClick}
+        title="Ir a mi panel"
+        className={`group inline-flex items-center gap-2 rounded-full border border-brand-500/50 bg-brand-500/10 py-1.5 pl-1.5 pr-4 text-[14px] font-medium text-paper transition hover:border-brand-500 hover:bg-brand-500/20 ${className}`}
+      >
+        <span className="grid h-7 w-7 place-items-center rounded-full bg-brand-500 font-display text-[13px] font-semibold uppercase text-white">
+          {first.charAt(0)}
+        </span>
+        <span className="max-w-[9rem] truncate">{first}</span>
+        <span className="text-paper/50 transition group-hover:translate-x-0.5 group-hover:text-paper">→</span>
+      </Link>
+    );
+  }
   return (
     <Link
       href="/admin/login"
@@ -24,22 +43,24 @@ function LoginButton({ label, className = "", onClick }: { label: string; classN
   );
 }
 
-export default function Header({ name, links, cta, ctaUrl, login }: { name: string; links: NavLink[]; cta: string; ctaUrl: string; login: string }) {
+export default function Header({ name, links, cta, ctaUrl, login, user = null, lang = "es", langs = ["es", "en"], decor = null }: { name: string; links: NavLink[]; cta: string; ctaUrl: string; login: string; user?: string | null; lang?: Lang; langs?: Lang[]; decor?: React.ReactNode }) {
   const [open, setOpen] = useState(false);
+  const path = (usePathname() || "/").replace(/^\/(en|pt)(?=\/|$)/, "") || "/";
+  const here = (href: string) => (href !== "/" && (path === href || path.startsWith(href + "/")) ? "page" : undefined);
   return (
     <header className="sticky top-0 z-40 border-b border-white/10 bg-ink-900/90 text-paper backdrop-blur">
       <div className="container-x flex h-16 items-center justify-between gap-6">
-        <Link href="/" aria-label={`${name}, inicio`}>
+        <Link href="/" data-door={name} aria-label={`${name}, inicio`}>
           <Logo name={name} light />
         </Link>
-        <nav className="hidden items-center gap-8 md:flex">
+        <nav className="hidden items-center gap-6 md:flex xl:gap-8">
           {links.map((n) => (
-            <Link key={n.href + n.label} href={n.href} className="text-[15px] text-paper/70 transition hover:text-paper">
+            <Link key={n.href + n.label} href={n.href} data-door={n.label} aria-current={here(n.href)} className="nav-door text-[15px] text-paper/70 hover:text-paper aria-[current=page]:text-paper">
               {n.label}
             </Link>
           ))}
           <div className="flex items-center gap-3">
-            {login && <LoginButton label={login} />}
+            {(login || user) && <LoginButton label={login} user={user} />}
             {cta && (
               <Link href={ctaUrl || "/contacto"} className="btn-signal !py-2">
                 {cta}
@@ -62,7 +83,7 @@ export default function Header({ name, links, cta, ctaUrl, login }: { name: stri
         <nav className="border-t border-white/10 bg-ink-900 md:hidden">
           <div className="container-x flex flex-col py-3">
             {links.map((n) => (
-              <Link key={n.href + n.label} href={n.href} onClick={() => setOpen(false)} className="border-b border-white/10 py-3 font-display text-2xl">
+              <Link key={n.href + n.label} href={n.href} data-door={n.label} onClick={() => setOpen(false)} className="border-b border-white/10 py-3 font-display text-2xl">
                 {n.label}
               </Link>
             ))}
@@ -72,11 +93,12 @@ export default function Header({ name, links, cta, ctaUrl, login }: { name: stri
                   {cta}
                 </Link>
               )}
-              {login && <LoginButton label={login} onClick={() => setOpen(false)} className="!py-2.5" />}
+              {(login || user) && <LoginButton label={login} user={user} onClick={() => setOpen(false)} className="!py-2.5" />}
             </div>
           </div>
         </nav>
       )}
+      {decor}
     </header>
   );
 }

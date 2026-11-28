@@ -1,8 +1,12 @@
+import CountUp from "@/components/CountUp";
+import TC from "@/components/TC";
+import AldoFlyBy from "./AldoFlyBy";
 import Link from "next/link";
 import { Fragment } from "react";
 import { lines } from "@/lib/utils";
 import HeroDoor from "./HeroDoor";
 import Carousel from "./Carousel";
+import Icon from "./Icon";
 import Aldo from "./Aldo";
 import type { Settings } from "@/lib/settings";
 import type { Faq, Plan, Product, Service, Testimonial } from "@prisma/client";
@@ -33,7 +37,7 @@ function Label({ n, children, light = false }: { n: string; children: React.Reac
   );
 }
 
-const Arrow = ({ className = "h-5 w-5" }: { className?: string }) => (
+export const Arrow = ({ className = "h-5 w-5" }: { className?: string }) => (
   <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth={1.6} aria-hidden="true">
     <path d="M5 12h14M13 6l6 6-6 6" />
   </svg>
@@ -42,8 +46,10 @@ const Arrow = ({ className = "h-5 w-5" }: { className?: string }) => (
 export function Hero({ s }: { s: Settings }) {
   const promises = [1, 2, 3].map((i) => [s[`hero.stat${i}Value`], s[`hero.stat${i}Label`]]).filter(([v]) => v);
   return (
-    <section className="relative overflow-hidden border-b border-paper-line bg-paper">
-      <div className="container-x grid grid-cols-1 items-center gap-20 pb-16 pt-28 sm:pt-32 lg:grid-cols-12 lg:gap-12 lg:pb-24 lg:pt-24">
+    <section className="relative overflow-hidden border-b border-paper-line">
+      <div className="pointer-events-none absolute -left-48 top-24 h-[30rem] w-[30rem] rounded-full bg-amber-300/20 blur-3xl" aria-hidden />
+      <div className="pointer-events-none absolute -right-40 -top-40 h-[34rem] w-[34rem] rounded-full bg-brand-500/10 blur-3xl" aria-hidden />
+      <div className="container-x relative grid grid-cols-1 items-center gap-20 pb-16 pt-28 sm:pt-32 lg:grid-cols-12 lg:gap-12 lg:pb-24 lg:pt-24">
         <div className="min-w-0 lg:col-span-7">
           {s["hero.kicker"] && (
             <p className="flex items-center gap-3 font-mono text-xs uppercase tracking-[0.14em] text-ink-500">
@@ -64,7 +70,7 @@ export function Hero({ s }: { s: Settings }) {
             <dl className="mt-14 grid grid-cols-3 gap-4 border-t border-ink-900/15 pt-8 sm:gap-6">
               {promises.map(([v, l]) => (
                 <div key={l} className="min-w-0">
-                  <dt className="font-display text-lg font-semibold leading-tight text-ink-900 sm:text-2xl">{v}</dt>
+                  <dt className="font-display text-lg font-semibold leading-tight text-ink-900 sm:text-2xl"><CountUp value={v} /></dt>
                   <dd className="mt-1 text-xs leading-snug text-ink-500 sm:text-sm">{l}</dd>
                 </div>
               ))}
@@ -80,40 +86,47 @@ export function Hero({ s }: { s: Settings }) {
 }
 
 export function ServicesList({ services, s }: { services: Service[]; s: Settings }) {
+  const featured = services.slice(0, 6);
+  const rest = services.slice(6);
   return (
     <section id="servicios" className="scroll-mt-16 py-24">
       <div className="container-x">
         <div className="grid gap-6 lg:grid-cols-12">
-          <div className="lg:col-span-5">
-            <Label n="01">Servicios</Label>
+          <div className="lg:col-span-6">
+            <Label n="01"><TC>{"Servicios"}</TC></Label>
             <h2 className="section-title mt-5"><Emph text={s["services.title"]} /></h2>
           </div>
-          <p className="self-end text-lg text-ink-700 lg:col-span-5 lg:col-start-8">{s["services.subtitle"]}</p>
+          <div className="self-end lg:col-span-5 lg:col-start-8">
+            <p className="text-lg text-ink-700">{s["services.subtitle"]}</p>
+          </div>
         </div>
-        <ul className="mt-14 border-t border-ink-900">
-          {services.map((sv, i) => (
-            <li key={sv.id} className="border-b border-paper-line">
-              <Link
-                href={`/servicios/${sv.slug}`}
-                className="group grid grid-cols-[2.5rem_1fr_auto] items-baseline gap-x-4 gap-y-2 py-7 transition-colors hover:bg-paper-2 sm:grid-cols-[4rem_1fr_1.2fr_auto] sm:px-3"
-              >
-                <span className="font-mono text-sm text-ink-400">{String(i + 1).padStart(2, "0")}</span>
-                <span className="font-display text-2xl text-ink-900 sm:text-3xl">{sv.title}</span>
-                <span className="col-start-2 text-ink-500 sm:col-start-3 sm:row-start-1">
-                  {sv.shortDescription}
-                  <span className="mt-3 hidden flex-wrap gap-1.5 sm:flex">
-                    {lines(sv.features).slice(0, 3).map((f) => (
-                      <span key={f} className="rounded border border-paper-line bg-paper px-2 py-0.5 font-mono text-[11px] text-ink-500">{f}</span>
-                    ))}
-                  </span>
+        <ul className="mt-14 grid gap-px overflow-hidden rounded-2xl border border-paper-line bg-paper-line sm:grid-cols-2 lg:grid-cols-3">
+          {featured.map((sv) => (
+            <li key={sv.id} className="min-w-0">
+              <Link href={`/servicios/${sv.slug}`} data-tilt="glow" className="group flex h-full flex-col bg-paper p-7 transition-colors duration-300 hover:bg-white">
+                <span className="grid h-11 w-11 place-items-center rounded-xl bg-brand-50 text-brand-600 transition duration-300 group-hover:rotate-[-6deg] group-hover:bg-brand-500 group-hover:text-white">
+                  <Icon name={sv.icon} className="h-5 w-5" />
                 </span>
-                <span className="col-start-3 row-start-1 text-ink-400 transition group-hover:translate-x-1 group-hover:text-brand-500 sm:col-start-4">
-                  <Arrow />
+                <h3 className="mt-5 font-display text-2xl leading-tight text-ink-900">{sv.title}</h3>
+                <p className="mt-2 flex-1 text-ink-500">{sv.shortDescription}</p>
+                <span className="mt-5 inline-flex items-center gap-2 text-sm font-medium text-ink-900"><TC>{"Ver más "}</TC><Arrow className="h-4 w-4 transition group-hover:translate-x-1 group-hover:text-brand-500" />
                 </span>
               </Link>
             </li>
           ))}
         </ul>
+        <div className="mt-8 flex flex-col gap-5 rounded-2xl bg-ink-900 p-6 text-paper sm:p-8 lg:flex-row lg:items-center lg:justify-between">
+          <div className="min-w-0">
+            <p className="font-display text-2xl">
+              {rest.length > 0 ? <>Y {rest.length}<TC>{" servicios más para tu negocio"}</TC></> : <><TC>{"Conoce cada servicio en detalle"}</TC></>}
+            </p>
+            {rest.length > 0 && (
+              <p className="mt-2 text-sm text-paper/60">{rest.slice(0, 6).map((r) => r.title).join(" · ")}{rest.length > 6 ? " · …" : ""}</p>
+            )}
+          </div>
+          <Link href="/servicios" className="btn-signal shrink-0 self-start lg:self-auto"><TC>{"Ver todos los servicios "}</TC><Arrow className="h-4 w-4" />
+          </Link>
+        </div>
       </div>
     </section>
   );
@@ -201,8 +214,8 @@ function DeskMock() {
   return (
     <div className="overflow-hidden rounded-xl border border-white/10 bg-[#1d1915] text-sm shadow-2xl shadow-black/40">
       <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
-        <span className="font-semibold text-paper">Castorly</span>
-        <span className="font-mono text-xs text-paper/40">Service Desk · Turno mañana</span>
+        <span className="font-semibold text-paper"><TC>{"Castorly"}</TC></span>
+        <span className="font-mono text-xs text-paper/40"><TC>{"Service Desk · Turno mañana"}</TC></span>
       </div>
       <div className="grid sm:grid-cols-[1fr_14rem]">
         <ul className="divide-y divide-white/5">
@@ -215,13 +228,11 @@ function DeskMock() {
           ))}
         </ul>
         <div className="border-t border-white/10 p-4 sm:border-l sm:border-t-0">
-          <p className="font-mono text-[11px] uppercase tracking-wider text-brand-400">Cástor</p>
-          <p className="mt-2 leading-relaxed text-paper/80">
-            Encontré el artículo «Reinstalar el cliente VPN». ¿Quieres que guíe la llamada paso a paso?
-          </p>
+          <p className="font-mono text-[11px] uppercase tracking-wider text-brand-400"><TC>{"Cástor"}</TC></p>
+          <p className="mt-2 leading-relaxed text-paper/80"><TC>{"Encontré el artículo «Reinstalar el cliente VPN». ¿Quieres que guíe la llamada paso a paso?"}</TC></p>
           <div className="mt-4 flex gap-2">
-            <span className="rounded bg-brand-500 px-2.5 py-1 text-xs font-semibold text-white">Sí, guíame</span>
-            <span className="rounded border border-white/15 px-2.5 py-1 text-xs text-paper/70">Ver artículo</span>
+            <span className="rounded bg-brand-500 px-2.5 py-1 text-xs font-semibold text-white"><TC>{"Sí, guíame"}</TC></span>
+            <span className="rounded border border-white/15 px-2.5 py-1 text-xs text-paper/70"><TC>{"Ver artículo"}</TC></span>
           </div>
         </div>
       </div>
@@ -236,18 +247,17 @@ export function ProductsList({ products, s }: { products: Product[]; s: Settings
     <section id="productos" className="scroll-mt-16 border-b border-paper-line py-24">
       <div className="container-x grid grid-cols-1 gap-12 lg:grid-cols-12">
         <div className="lg:col-span-4">
-          <Label n="03">Productos</Label>
+          <Label n="03"><TC>{"Productos"}</TC></Label>
           <h2 className="section-title mt-5"><Emph text={s["products.title"]} /></h2>
           <p className="mt-5 text-ink-700">{s["products.subtitle"]}</p>
         </div>
         <div className="grid gap-px overflow-hidden rounded-xl border border-paper-line bg-paper-line sm:grid-cols-2 lg:col-span-8">
           {others.map((p) => (
-            <Link key={p.id} href={`/productos/${p.slug}`} className="group flex flex-col bg-paper p-7 transition-colors hover:bg-white">
+            <Link key={p.id} href={`/productos/${p.slug}`} data-tilt="glow" className="group flex flex-col bg-paper p-7 transition-colors hover:bg-white">
               <h3 className="font-display text-2xl text-ink-900">{p.name}</h3>
               <p className="mt-2 flex-1 text-ink-500">{p.tagline}</p>
               {p.price && <p className="mt-6 text-sm font-semibold text-ink-900">{p.price}</p>}
-              <span className="mt-4 inline-flex items-center gap-2 text-sm text-ink-700 group-hover:text-brand-600">
-                Ver detalles <Arrow className="h-4 w-4" />
+              <span className="mt-4 inline-flex items-center gap-2 text-sm text-ink-700 group-hover:text-brand-600"><TC>{"Ver detalles "}</TC><Arrow className="h-4 w-4" />
               </span>
             </Link>
           ))}
@@ -266,12 +276,12 @@ export function Process({ s }: { s: Settings }) {
   return (
     <section className="py-24">
       <div className="container-x">
-        <Label n="04">Cómo trabajamos</Label>
+        <Label n="04"><TC>{"Cómo trabajamos"}</TC></Label>
         <h2 className="section-title mt-5 max-w-2xl"><Emph text={s["process.title"]} /></h2>
         <ol className="mt-14 grid gap-10 md:grid-cols-2 lg:grid-cols-4 lg:gap-8">
           {steps.map((st, i) => (
             <li key={i} className="border-t border-ink-900 pt-5">
-              <span className="font-mono text-xs text-brand-500">Paso {String(i + 1).padStart(2, "0")}</span>
+              <span className="font-mono text-xs text-brand-500"><TC>{"Paso "}</TC>{String(i + 1).padStart(2, "0")}</span>
               <h3 className="mt-3 font-display text-2xl text-ink-900">{st.title}</h3>
               <p className="mt-3 leading-relaxed text-ink-500">{st.text}</p>
             </li>
@@ -289,7 +299,7 @@ export function Plans({ plans, s }: { plans: Plan[]; s: Settings }) {
       <div className="container-x">
         <div className="grid gap-6 lg:grid-cols-12">
           <div className="lg:col-span-6">
-            <Label n="05">Planes</Label>
+            <Label n="05"><TC>{"Planes"}</TC></Label>
             <h2 className="section-title mt-5"><Emph text={s["plans.title"]} /></h2>
           </div>
           <p className="self-end text-ink-700 lg:col-span-5 lg:col-start-8">{s["plans.subtitle"]}</p>
@@ -298,10 +308,10 @@ export function Plans({ plans, s }: { plans: Plan[]; s: Settings }) {
           {plans.map((p) => {
             const hl = p.highlighted;
             return (
-              <div key={p.id} className={`flex flex-col rounded-xl p-8 ${hl ? "bg-ink-900 text-paper" : "border border-paper-line bg-paper"}`}>
+              <div key={p.id} data-tilt="tilt" className={`flex flex-col rounded-xl p-8 ${hl ? "bg-ink-900 text-paper" : "border border-paper-line bg-paper"}`}>
                 <div className="flex items-baseline justify-between gap-3">
                   <h3 className="font-display text-2xl">{p.name}</h3>
-                  {hl && <span className="font-mono text-[11px] uppercase tracking-wider text-brand-400">El más elegido</span>}
+                  {hl && <span className="font-mono text-[11px] uppercase tracking-wider text-brand-400"><TC>{"El más elegido"}</TC></span>}
                 </div>
                 <p className={`mt-1 text-sm ${hl ? "text-paper/60" : "text-ink-500"}`}>{p.description}</p>
                 <p className="mt-8 font-display text-5xl tracking-tight">{p.price}</p>
@@ -314,8 +324,7 @@ export function Plans({ plans, s }: { plans: Plan[]; s: Settings }) {
                 <Link
                   href={`/contacto?servicio=${encodeURIComponent("Plan " + p.name)}`}
                   className={`mt-8 ${hl ? "btn-signal" : "btn-outline"}`}
-                >
-                  Elegir {p.name}
+                ><TC>{"Elegir "}</TC>{p.name}
                 </Link>
               </div>
             );
@@ -363,7 +372,7 @@ export function FaqList({ items, s }: { items: Faq[]; s: Settings }) {
     <section id="faq" className="scroll-mt-16 border-t border-paper-line py-24">
       <div className="container-x grid grid-cols-1 gap-10 lg:grid-cols-12">
         <div className="lg:col-span-4">
-          <Label n="07">Preguntas</Label>
+          <Label n="07"><TC>{"Preguntas"}</TC></Label>
           <h2 className="section-title mt-5"><Emph text={s["faq.title"]} /></h2>
         </div>
         <div className="border-t border-ink-900 lg:col-span-8">
@@ -376,6 +385,33 @@ export function FaqList({ items, s }: { items: Faq[]; s: Settings }) {
               <p className="-mt-2 max-w-2xl whitespace-pre-line pb-6 leading-relaxed text-ink-500">{f.answer}</p>
             </details>
           ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/** Franja de la portada que presenta a Aldo y lleva a /nosotros. */
+export function AldoBand({ s }: { s: Settings }) {
+  return (
+    <section className="relative overflow-hidden bg-ink-900 py-20 text-paper">
+      <AldoFlyBy top="14%" size={48} every={19} delay={3} onDark />
+      <div className="container-x relative grid items-center gap-10 lg:grid-cols-12">
+        <div className="flex justify-center gap-2 lg:col-span-5 lg:justify-start">
+          {(["wave", "think", "cheer"] as const).map((pose, i) => (
+            <div key={pose} className={`aldo-hover ${i === 1 ? "-translate-y-4" : ""}`}>
+              <Aldo pose={pose} onDark className="h-24 w-24 sm:h-32 sm:w-32" />
+            </div>
+          ))}
+        </div>
+        <div className="lg:col-span-7">
+          <p className="font-mono text-xs uppercase tracking-[0.2em] text-brand-400"><TC>{"Nuestra mascota"}</TC></p>
+          <h2 className="mt-3 font-display text-4xl leading-[1.05] sm:text-5xl"><Emph text={s["aldo.title"]} /></h2>
+          <p className="mt-5 max-w-2xl text-lg leading-relaxed text-paper/70">{s["aldo.text"]}</p>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link href="/nosotros#aldo" className="btn-signal"><TC>{"Conoce a Aldo "}</TC><Arrow className="h-4 w-4" /></Link>
+            <Link href="/nosotros" className="btn-ghost text-paper"><TC>{"Quiénes somos"}</TC></Link>
+          </div>
         </div>
       </div>
     </section>

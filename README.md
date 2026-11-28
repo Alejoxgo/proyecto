@@ -55,6 +55,7 @@ Ingresa a http://localhost:3000/admin con `ADMIN_EMAIL` / `ADMIN_PASSWORD` y cam
 | `SETUP_CODE` | Código para crear el primer administrador desde `/admin/login` cuando la base está vacía |
 | `GROQ_API_KEY` | (Opcional) Clave de Groq para que Aldo, el chat del sitio, responda con IA. Sin ella responde por palabras clave |
 | `GROQ_MODEL` | (Opcional) Modelo de Groq. Por defecto `llama-3.3-70b-versatile` |
+| `RESEND_API_KEY` | (Opcional) Clave de [Resend](https://resend.com) para los avisos por correo de nuevas solicitudes y la respuesta automática. El remitente y el destino se configuran en el panel → Textos del sitio → Avisos por correo |
 | `INSECURE_COOKIES` | Pon `true` solo si pruebas en producción **sin HTTPS** (no recomendado) |
 
 ## Despliegue

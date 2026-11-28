@@ -1,4 +1,5 @@
-import Aldo from "./Aldo";
+import TC from "@/components/TC";
+import HeroAldo from "./HeroAldo";
 
 const chat = [
   { me: false, t: "Hola 👋 ¿tienen cita para mañana?" },
@@ -25,9 +26,8 @@ export default function HeroDoor({ caption }: { caption: string }) {
         <path d="M2 358V191C2 91 72 31 150 2c78 29 148 89 148 189v167" stroke="currentColor" strokeDasharray="4 6" />
       </svg>
 
-      <div className="absolute -top-[86px] left-1/2 z-20 -translate-x-1/2">
-        <Aldo pose="base" className="h-[96px] w-[96px]" title="Aldo, el búho de Aldore" />
-      </div>
+      {/* Aldo llega volando y se posa encima de la puerta; si lo tocas se va y luego regresa */}
+      <HeroAldo />
 
       <div className="relative z-10 aspect-[30/36] w-full bg-ink-900" style={{ clipPath: "url(#aldore-arch)" }}>
         {/* El umbral bermellón: la entrada del logo */}
@@ -35,10 +35,10 @@ export default function HeroDoor({ caption }: { caption: string }) {
 
         <div className="absolute inset-x-[9%] bottom-[7%] top-[30%] flex flex-col">
           <div className="flex items-center gap-2.5 border-b border-white/10 pb-3">
-            <span className="grid h-8 w-8 place-items-center rounded-full bg-emerald-500 text-[11px] font-bold text-white">PO</span>
+            <span className="grid h-8 w-8 place-items-center rounded-full bg-emerald-500 text-[11px] font-bold text-white"><TC>{"PO"}</TC></span>
             <div className="min-w-0 leading-tight">
-              <p className="truncate text-sm font-semibold text-paper">Peluquería Ola</p>
-              <p className="font-mono text-[10px] text-emerald-400">bot · en línea</p>
+              <p className="truncate text-sm font-semibold text-paper"><TC>{"Peluquería Ola"}</TC></p>
+              <p className="font-mono text-[10px] text-emerald-400"><TC>{"bot · en línea"}</TC></p>
             </div>
           </div>
           <ul className="mt-3 flex flex-1 flex-col justify-end gap-2">
@@ -50,7 +50,7 @@ export default function HeroDoor({ caption }: { caption: string }) {
                 }`}
                 style={{ animationDelay: `${i * 1.4}s` }}
               >
-                {m.t}
+                <TC>{m.t}</TC>
               </li>
             ))}
           </ul>

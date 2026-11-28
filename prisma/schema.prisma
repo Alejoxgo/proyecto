@@ -14,7 +14,85 @@ model User {
   email        String   @unique
   name         String
   passwordHash String
+  /// "admin" gestiona usuarios y todo el panel; "editor" maneja el contenido pero no los usuarios.
+  role         String   @default("admin")
+  /// Cargo que se muestra en el panel (ej. "Gerente", "Desarrollador").
+  title        String   @default("")
+  /// Foto de perfil: imagen (data URL) o uno de los Aldos ("aldo-1" … "aldo-10").
+  avatar       String   @default("aldo-1")
+  /// Rol con permisos (si role no es "admin"). Ver modelo Role.
+  roleId       Int?
+  /// Segundo factor con app autenticadora (Google Authenticator, Authy…). Secreto en base32.
+  totpSecret   String   @default("")
+  totpOn       Boolean  @default(false)
   createdAt    DateTime @default(now())
+}
+
+/// Roles del panel con casillas de permisos (lista separada por comas, ver src/lib/permissions.ts).
+model Role {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  description String   @default("")
+  perms       String   @default("")
+  createdAt   DateTime @default(now())
+}
+
+/// Llaves de acceso (passkeys / WebAuthn) de los usuarios del panel.
+model Passkey {
+  id         Int       @id @default(autoincrement())
+  userId     Int
+  credId     String    @unique
+  publicKey  String
+  counter    Int       @default(0)
+  transports String    @default("")
+  name       String    @default("Llave de acceso")
+  createdAt  DateTime  @default(now())
+  lastUsed   DateTime?
+
+  @@index([userId])
+}
+
+/// Correo interno entre los usuarios del panel.
+model InternalMessage {
+  id          Int       @id @default(autoincrement())
+  fromId      Int
+  toId        Int
+  subject     String
+  body        String
+  readAt      DateTime?
+  fromDeleted Boolean   @default(false)
+  toDeleted   Boolean   @default(false)
+  replyTo     Int?
+  createdAt   DateTime  @default(now())
+
+  @@index([toId, readAt])
+  @@index([fromId])
+}
+
+/// Código de verificación por correo (segundo paso del ingreso al panel).
+model MfaChallenge {
+  id        String   @id
+  userId    Int
+  codeHash  String
+  attempts  Int      @default(0)
+  expires   Int // segundos desde 1970
+  sentAt    Int // segundos desde 1970
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+/// Traducciones automáticas (Groq) del sitio público. `key` es la huella del texto en español.
+model Translation {
+  id        Int      @id @default(autoincrement())
+  lang      String
+  key       String
+  source    String
+  text      String
+  manual    Boolean  @default(false)
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@unique([lang, key])
 }
 
 model Service {
@@ -104,49 +182,98 @@ model Lead {
 // Los valores en dinero son pesos enteros (COP).
 
 model Client {
-  id        Int      @id @default(autoincrement())
-  name      String
-  company   String   @default("")
-  taxId     String   @default("")
-  email     String   @default("")
-  phone     String   @default("")
-  city      String   @default("")
-  notes     String   @default("")
-  createdAt DateTime @default(now())
-  orders    Order[]
+  id          Int      @id @default(autoincrement())
+  name        String
+  company     String   @default("")
+  taxId       String   @default("")
+  email       String   @default("")
+  phone       String   @default("")
+  city        String   @default("")
+  notes       String   @default("")
+  portalToken String   @default("")
+  /// Acceso del cliente a su portal con correo y contraseña (vacío = sin acceso con contraseña).
+  portalHash  String   @default("")
+  /// Color e iniciales para identificar la empresa en el panel.
+  color       String   @default("#e2471c")
+  createdAt   DateTime @default(now())
+  orders      Order[]
+}
+
+// ---------- Email marketing ----------
+model Contact {
+  id         Int      @id @default(autoincrement())
+  email      String   @unique
+  name       String   @default("")
+  tags       String   @default("")
+  source     String   @default("manual")
+  subscribed Boolean  @default(true)
+  token      String   @unique
+  clientId   Int?
+  createdAt  DateTime @default(now())
+}
+
+model Campaign {
+  id         Int       @id @default(autoincrement())
+  subject    String
+  preheader  String    @default("")
+  body       String    @default("")
+  ctaLabel   String    @default("")
+  ctaUrl     String    @default("")
+  audience   String    @default("todos")
+  status     String    @default("borrador")
+  sentAt     DateTime?
+  sentCount  Int       @default(0)
+  openCount  Int       @default(0)
+  clickCount Int       @default(0)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @default(now()) @updatedAt
+}
+
+model CampaignSend {
+  id         Int       @id @default(autoincrement())
+  campaignId Int
+  contactId  Int
+  key        String    @unique
+  status     String    @default("enviado")
+  openedAt   DateTime?
+  clickedAt  DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@unique([campaignId, contactId])
 }
 
 model Order {
-  id        Int      @id @default(autoincrement())
-  title     String
-  clientId  Int?
-  client    Client?  @relation(fields: [clientId], references: [id], onDelete: SetNull)
-  service   String   @default("")
-  status    String   @default("cotizacion")
-  amount    Int      @default(0)
-  paid      Int      @default(0)
-  startDate String   @default("")
-  dueDate   String   @default("")
-  notes     String   @default("")
-  leadId    Int?
-  createdAt DateTime @default(now())
+  id           Int      @id @default(autoincrement())
+  title        String
+  clientId     Int?
+  client       Client?  @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  service      String   @default("")
+  status       String   @default("cotizacion")
+  amount       Int      @default(0)
+  paid         Int      @default(0)
+  startDate    String   @default("")
+  dueDate      String   @default("")
+  clientUpdate String   @default("")
+  notes        String   @default("")
+  leadId       Int?
+  createdAt    DateTime @default(now())
 }
 
 model Employee {
-  id           Int           @id @default(autoincrement())
+  id           Int            @id @default(autoincrement())
   name         String
-  document     String        @default("")
-  email        String        @default("")
-  phone        String        @default("")
-  position     String        @default("")
-  contractType String        @default("indefinido")
-  salary       Int           @default(0)
-  startDate    String        @default("")
-  bank         String        @default("")
-  bankAccount  String        @default("")
-  active       Boolean       @default(true)
-  notes        String        @default("")
-  createdAt    DateTime      @default(now())
+  document     String         @default("")
+  email        String         @default("")
+  phone        String         @default("")
+  position     String         @default("")
+  contractType String         @default("indefinido")
+  salary       Int            @default(0)
+  startDate    String         @default("")
+  bank         String         @default("")
+  bankAccount  String         @default("")
+  active       Boolean        @default(true)
+  notes        String         @default("")
+  createdAt    DateTime       @default(now())
   payrolls     Payroll[]
   requests     StaffRequest[]
 }
@@ -183,19 +310,163 @@ model StaffRequest {
 
 // ---------- Puerta by Aldore: páginas de un toque (QR / NFC) para clientes ----------
 model LinkPage {
+  id          Int      @id @default(autoincrement())
+  slug        String   @unique
+  name        String
+  subtitle    String   @default("")
+  logoUrl     String   @default("")
+  coverUrl    String   @default("")
+  color       String   @default("#e2471c")
+  bgColor     String   @default("")
+  theme       String   @default("oscuro")
+  font        String   @default("moderna")
+  buttonStyle String   @default("tarjeta")
+  buttons     String   @default("")
+  wifiName    String   @default("")
+  wifiPass    String   @default("")
+  clientId    Int?
+  published   Boolean  @default(true)
+  views       Int      @default(0)
+  clicks      Int      @default(0)
+  createdAt   DateTime @default(now())
+}
+
+// ---------- Blog ----------
+model Post {
+  id          Int      @id @default(autoincrement())
+  slug        String   @unique
+  title       String
+  excerpt     String   @default("")
+  content     String   @default("")
+  coverUrl    String   @default("")
+  tags        String   @default("")
+  author      String   @default("Equipo Aldore")
+  publishedAt String   @default("")
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
+}
+
+// ---------- Turnos con QR ----------
+model Queue {
+  id            Int      @id @default(autoincrement())
+  slug          String   @unique
+  name          String
+  subtitle      String   @default("")
+  logoUrl       String   @default("")
+  color         String   @default("#e2471c")
+  prefix        String   @default("A")
+  lastNumber    Int      @default(0)
+  currentNumber Int      @default(0)
+  avgMinutes    Int      @default(5)
+  open          Boolean  @default(true)
+  staffKey      String   @default("")
+  clientId      Int?
+  createdAt     DateTime @default(now())
+}
+
+model Ticket {
+  id        Int       @id @default(autoincrement())
+  queueId   Int
+  number    Int
+  name      String    @default("")
+  code      String    @unique
+  status    String    @default("esperando")
+  createdAt DateTime  @default(now())
+  calledAt  DateTime?
+
+  @@index([queueId, status])
+}
+
+// ---------- Menú del día ----------
+model MenuBoard {
   id        Int      @id @default(autoincrement())
   slug      String   @unique
   name      String
   subtitle  String   @default("")
   logoUrl   String   @default("")
   color     String   @default("#e2471c")
-  theme     String   @default("oscuro")
-  buttons   String   @default("")
-  wifiName  String   @default("")
-  wifiPass  String   @default("")
-  clientId  Int?
+  whatsapp  String   @default("")
+  date      String   @default("")
+  items     String   @default("")
+  price     String   @default("")
+  notes     String   @default("")
+  hours     String   @default("")
+  staffKey  String   @default("")
   published Boolean  @default(true)
-  views     Int      @default(0)
-  clicks    Int      @default(0)
+  clientId  Int?
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
+// ---------- Llamadas agendadas desde el sitio ----------
+model Booking {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String
+  phone     String   @default("")
+  company   String   @default("")
+  topic     String   @default("")
+  notes     String   @default("")
+  /// Fecha "AAAA-MM-DD" y hora "HH:MM" en hora de Colombia.
+  date      String
+  time      String
+  /// agendada | hecha | cancelada
+  status    String   @default("agendada")
+  leadId    Int?
   createdAt DateTime @default(now())
+
+  @@index([date, time])
+}
+
+// ---------- Casos de éxito ----------
+model CaseStudy {
+  id          Int      @id @default(autoincrement())
+  slug        String   @unique
+  title       String
+  client      String   @default("")
+  industry    String   @default("")
+  summary     String   @default("")
+  challenge   String   @default("")
+  solution    String   @default("")
+  /// Un resultado por línea: "48% | más reservas".
+  results     String   @default("")
+  quote       String   @default("")
+  quoteAuthor String   @default("")
+  coverUrl    String   @default("")
+  tags        String   @default("")
+  /// Proyecto propio de Aldore (no de un cliente).
+  own         Boolean  @default(false)
+  order       Int      @default(0)
+  published   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+// ---------- Pagos en línea (Wompi) ----------
+model Payment {
+  id        Int      @id @default(autoincrement())
+  orderId   Int
+  reference String   @unique
+  amount    Int
+  /// pendiente | aprobado | rechazado | anulado | error
+  status    String   @default("pendiente")
+  method    String   @default("")
+  wompiId   String   @default("")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@index([orderId])
+}
+
+// ---------- Estadísticas diarias de cada Puerta ----------
+model PuertaStat {
+  id     Int    @id @default(autoincrement())
+  pageId Int
+  day    String
+  /// view | click
+  kind   String
+  /// Título del botón tocado ("" para visitas).
+  label  String @default("")
+  count  Int    @default(0)
+
+  @@unique([pageId, day, kind, label])
 }

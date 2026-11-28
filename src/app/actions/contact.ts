@@ -1,5 +1,7 @@
 "use server";
 import { prisma } from "@/lib/db";
+import { mailReady } from "@/lib/mail";
+import { notifyLead } from "@/lib/notify";
 
 export type ContactState = { ok: boolean; message: string; errors?: Record<string, string>; values?: Record<string, string> };
 
@@ -25,6 +27,8 @@ export async function submitContact(_prev: ContactState, formData: FormData): Pr
   if (data.message.length < 10) errors.message = "Cuéntanos un poco más (mínimo 10 caracteres).";
   if (Object.keys(errors).length) return { ok: false, message: "Revisa los campos marcados.", errors, values: data };
 
-  await prisma.lead.create({ data });
+  const lead = await prisma.lead.create({ data });
+  if (mailReady()) await notifyLead(lead.id, data).catch((e) => console.error("Aviso de contacto", e));
   return { ok: true, message: "¡Gracias! Recibimos tu mensaje y te contactaremos en menos de 48 horas." };
 }
+

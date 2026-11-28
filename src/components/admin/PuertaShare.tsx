@@ -6,7 +6,7 @@ export default async function PuertaShare({ slug, views, clicks }: { slug: strin
   const svg = await QRCode.toString(url, { type: "svg", margin: 1, color: { dark: "#16130f", light: "#ffffff" } });
   const href = `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
   return (
-    <section className="mb-6 grid gap-5 rounded-2xl border border-slate-200 bg-white p-5 sm:grid-cols-[160px_1fr]">
+    <section className="mb-6 grid gap-5 rounded-2xl border border-black/[0.06] bg-white shadow-[0_1px_2px_rgba(0,0,0,.04)] p-5 sm:grid-cols-[160px_1fr]">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={href} alt={`QR de ${url}`} className="h-40 w-40 rounded-lg border border-slate-200" />
       <div className="min-w-0">

@@ -15,6 +15,8 @@ const KEYWORDS: Record<string, string[]> = {
   fidelizacion: ["fidelizacion", "fidelizar", "sellos", "puntos", "frecuentes", "premio", "volver"],
   "resenas-google": ["resena", "resenas", "google", "maps", "estrellas", "opiniones", "calificacion"],
   "mantenimiento-web": ["mantenimiento", "actualizar", "cambios", "dominio", "renovar", "copias"],
+  "turnos-qr": ["turno", "turnos", "fila", "filas", "espera", "esperar", "cola", "sala"],
+  "menu-del-dia": ["almuerzo", "almuerzos", "corrientazo", "ejecutivo", "dia", "restaurante"],
   "impresion-3d": ["3d", "impresion", "imprimir", "impresora", "prototipo", "pieza", "piezas", "llaveros", "figura", "modelo", "filamento"],
   "agenda-online": ["agenda", "agendar", "reserva", "reservas", "citas", "turnos", "recordatorio", "recordatorios", "peluqueria", "consultorio"],
   "catalogo-whatsapp": ["catalogo", "productos", "carrito", "vender", "pedidos", "tienda"],
@@ -67,16 +69,20 @@ export function buildAldo(s: Settings, services: Svc[], products: Prod[], plans:
       price: p.price || quote,
       keywords: KEYWORDS[p.slug] ?? [],
     })),
-    { id: "precios", label: "Precios", answer: `${webPrices}\n\n${puertaPrice}\n\nPara apps, chatbots e integraciones: ${quote}`, href: "/#planes", keywords: ["precio", "precios", "planes", "cuanto", "cuesta", "valor", "tarifa"] },
+    { id: "cotizar", label: "Cotizar en línea", answer: "En el cotizador eliges qué necesitas y ves un rango de precio al instante, sin dejar tus datos hasta el final.", href: "/cotizar", keywords: ["cotizar", "cotizacion", "cotizador", "presupuesto", "calcular"] },
+    { id: "nosotros", label: "Quiénes somos", answer: "Somos Aldore, un estudio de software en Medellín. En la página Nosotros está nuestra misión, la visión, lo que nos guía… y mi propia sección. 🦉", href: "/nosotros", keywords: ["nosotros", "quienes", "somos", "empresa", "mision", "vision", "valores", "equipo", "aldo", "buho", "mascota"] },
+    { id: "blog", label: "Blog", answer: "En el blog tenemos guías cortas sobre páginas web, chatbots, QR y más, escritas para dueños de negocio.", href: "/blog", keywords: ["blog", "articulo", "articulos", "guia", "guias", "aprender"] },
+    { id: "precios", label: "Precios", answer: `${webPrices}\n\n${puertaPrice}\n\nPara apps, chatbots e integraciones: ${quote}\n\nSi quieres un número rápido, usa el cotizador en línea.`, href: "/cotizar", keywords: ["precio", "precios", "planes", "cuanto", "cuesta", "valor", "tarifa"] },
     { id: "humano", label: "Hablar con una persona", answer: "", keywords: KEYWORDS.humano },
   ];
 
   const pick = (slug: string) => topics.find((t) => t.id === slug)?.label;
-  const quick = [pick("desarrollo-web"), pick("chatbots"), "Puerta (QR / NFC)", pick("aplicaciones"), "Precios", "Ver otros servicios", "Hablar con una persona"].filter(Boolean) as string[];
+  const quick = [pick("desarrollo-web"), pick("chatbots"), "Puerta (QR / NFC)", "Cotizar en línea", "Precios", "Ver otros servicios", "Hablar con una persona"].filter(Boolean) as string[];
 
   return {
     greeting: s["aldo.greeting"],
     bubble: s["aldo.bubble"],
+    tips: (s["aldo.tips"] || "").split("\n").map((t) => t.trim()).filter(Boolean),
     whatsapp: s["contact.whatsapp"],
     hours: s["contact.hours"],
     topics,

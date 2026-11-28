@@ -24,6 +24,8 @@
     "@opennextjs/cloudflare": "^1.20.19",
     "@prisma/adapter-d1": "^6.19.3",
     "@prisma/client": "^6.19.0",
+    "@simplewebauthn/browser": "^13.3.0",
+    "@simplewebauthn/server": "^13.3.3",
     "bcryptjs": "^3.0.2",
     "jose": "^6.0.0",
     "next": "^15.5.0",

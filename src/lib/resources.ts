@@ -1,5 +1,6 @@
 // Configuración del CRUD genérico del panel. Cada recurso = un modelo de Prisma.
 import { ICON_NAMES } from "@/components/Icon";
+import { randomKey } from "./utils";
 
 export type FieldType = "text" | "textarea" | "number" | "checkbox" | "select" | "url" | "slug" | "money" | "date" | "month" | "relation" | "email";
 
@@ -23,7 +24,7 @@ export type ColumnFormat = "money" | "status" | "relation" | "bool" | "date";
 
 export type ResourceConfig = {
   key: string;
-  model: "service" | "product" | "plan" | "testimonial" | "faq" | "client" | "order" | "employee" | "payroll" | "staffRequest" | "linkPage";
+  model: "service" | "product" | "plan" | "testimonial" | "caseStudy" | "faq" | "client" | "order" | "employee" | "payroll" | "staffRequest" | "linkPage" | "post" | "queue" | "menuBoard";
   label: string;
   singular: string;
   description: string;
@@ -148,6 +149,38 @@ export const RESOURCES: ResourceConfig[] = [
     ],
   },
   {
+    key: "casos",
+    model: "caseStudy",
+    label: "Casos de éxito",
+    singular: "caso",
+    description: "Proyectos terminados con resultados. La sección aparece en el sitio cuando publicas el primero. Si aún no tienes clientes, muestra tus productos propios marcándolos como «Proyecto propio».",
+    titleField: "title",
+    columns: [
+      { name: "title", label: "Título" },
+      { name: "client", label: "Cliente" },
+      { name: "own", label: "Propio", format: "bool" },
+      { name: "published", label: "Publicado", format: "bool" },
+    ],
+    defaults: { published: "false" },
+    fields: [
+      { name: "title", label: "Título del caso", type: "text", required: true, help: "Ej.: «Café Laurel duplicó sus reseñas en Google en un mes»." },
+      { name: "slug", label: "Slug (URL)", type: "slug", help: "Se genera a partir del título si lo dejas vacío." },
+      { name: "client", label: "Cliente o proyecto", type: "text", half: true },
+      { name: "industry", label: "Sector", type: "text", half: true, help: "Ej.: Restaurante, Clínica, Inmobiliaria." },
+      { name: "own", label: "Proyecto propio de Aldore (no de un cliente)", type: "checkbox" },
+      { name: "summary", label: "Resumen (tarjeta)", type: "textarea", rows: 2, required: true },
+      { name: "challenge", label: "El reto", type: "textarea", rows: 4, help: "Qué problema tenía el cliente antes." },
+      { name: "solution", label: "Lo que hicimos", type: "textarea", rows: 5, help: "Separa párrafos con una línea en blanco." },
+      { name: "results", label: "Resultados en números", type: "textarea", rows: 4, help: "Uno por línea: número | qué significa. Ej.: 48% | más reservas en línea" },
+      { name: "quote", label: "Testimonio del cliente", type: "textarea", rows: 3 },
+      { name: "quoteAuthor", label: "Quién lo dice", type: "text", help: "Ej.: Laura Gómez, gerente de Café Laurel." },
+      { name: "coverUrl", label: "Imagen de portada (URL)", type: "url" },
+      { name: "tags", label: "Etiquetas", type: "text", help: "Separadas por coma: Página web, Puerta, Chatbot." },
+      order,
+      { ...published, label: "Publicado (visible en el sitio)" },
+    ],
+  },
+  {
     key: "preguntas",
     model: "faq",
     label: "Preguntas frecuentes",
@@ -238,7 +271,8 @@ export const BUSINESS_RESOURCES: ResourceConfig[] = [
       { name: "paid", label: "Pagado hasta hoy (COP)", type: "money", half: true },
       { name: "startDate", label: "Fecha de inicio", type: "date", half: true },
       { name: "dueDate", label: "Fecha de entrega", type: "date", half: true },
-      { name: "notes", label: "Notas", type: "textarea", rows: 4 },
+      { name: "clientUpdate", label: "Novedad para el cliente", type: "textarea", rows: 3, help: "Lo ve el cliente en su portal. Ej: Ya está lista la primera versión, revísala y nos cuentas." },
+      { name: "notes", label: "Notas internas", type: "textarea", rows: 4, help: "Solo las ves tú." },
     ],
   },
   {
@@ -262,8 +296,13 @@ export const BUSINESS_RESOURCES: ResourceConfig[] = [
       { name: "city", label: "Ciudad", type: "text", half: true },
       { name: "email", label: "Correo", type: "email", half: true },
       { name: "phone", label: "Teléfono / WhatsApp", type: "text", half: true },
-      { name: "notes", label: "Notas", type: "textarea", rows: 4 },
+      { name: "color", label: "Color para identificarlo en el panel", type: "text", half: true, help: "Código de color, ej: #1F5C45" },
+      { name: "notes", label: "Notas (internas)", type: "textarea", rows: 4 },
+      { name: "portalToken", label: "Clave del portal del cliente", type: "text", help: "Se crea sola. Cámbiala o bórrala y guarda para generar un enlace nuevo (el anterior deja de funcionar)." },
     ],
+    beforeSave(data) {
+      if (!String(data.portalToken || "").trim()) data.portalToken = randomKey();
+    },
   },
   {
     key: "empleados",
@@ -385,16 +424,41 @@ export const PUERTA_RESOURCE: ResourceConfig = {
     { name: "slug", label: "Dirección (aldore.co/p/…)", type: "slug", half: true, help: "Se genera del nombre si lo dejas vacío. Ej: padre-nuestro-sabaneta" },
     { name: "subtitle", label: "Texto bajo el nombre", type: "text", half: true, help: "Ej: Sabaneta · Cocina de autor" },
     { name: "clientId", label: "Cliente (para tu control)", type: "relation", relation: { model: "client", labelField: "name" }, half: true },
-    { name: "logoUrl", label: "Logo (URL de la imagen)", type: "url", help: "Si lo dejas vacío se muestran las iniciales." },
-    { name: "color", label: "Color de la marca", type: "text", half: true, help: "Código de color, ej: #e2471c" },
+    { name: "logoUrl", label: "Logo (URL de la imagen)", type: "url", half: true, help: "Cuadrado, idealmente PNG o SVG. Si lo dejas vacío se muestran las iniciales." },
+    { name: "coverUrl", label: "Imagen de portada (URL)", type: "url", half: true, help: "Foto horizontal del local, la comida o la marca. Opcional." },
+    { name: "color", label: "Color principal de la marca", type: "text", half: true, help: "Código de color, ej: #1F5C45" },
+    { name: "bgColor", label: "Color de fondo", type: "text", half: true, help: "Ej: #F3EADB. Vacío = usa el fondo de abajo." },
     {
       name: "theme",
-      label: "Fondo",
+      label: "Fondo base (si no hay color de fondo)",
       type: "select",
       half: true,
       options: [
         { value: "oscuro", label: "Oscuro" },
         { value: "claro", label: "Claro" },
+      ],
+    },
+    {
+      name: "font",
+      label: "Tipografía",
+      type: "select",
+      half: true,
+      options: [
+        { value: "moderna", label: "Moderna (limpia)" },
+        { value: "elegante", label: "Elegante (con serifa)" },
+        { value: "redondeada", label: "Redondeada (amigable)" },
+        { value: "tecnica", label: "Técnica (geométrica)" },
+      ],
+    },
+    {
+      name: "buttonStyle",
+      label: "Estilo de los botones",
+      type: "select",
+      half: true,
+      options: [
+        { value: "tarjeta", label: "Tarjeta" },
+        { value: "solido", label: "Sólido de color" },
+        { value: "contorno", label: "Contorno" },
       ],
     },
     {
@@ -424,7 +488,133 @@ export const PUERTA_RESOURCE: ResourceConfig = {
   },
 };
 
-RESOURCES.push(...BUSINESS_RESOURCES, PUERTA_RESOURCE);
+export const BLOG_RESOURCE: ResourceConfig = {
+  key: "blog",
+  model: "post",
+  label: "Blog",
+  singular: "artículo",
+  description: "Artículos del blog en aldore.co/blog. Ayudan a que te encuentren en Google.",
+  titleField: "title",
+  sort: [{ publishedAt: "desc" }, { id: "desc" }],
+  columns: [
+    { name: "title", label: "Título" },
+    { name: "publishedAt", label: "Fecha", format: "date" },
+    { name: "tags", label: "Etiquetas" },
+    { name: "published", label: "Publicado", format: "bool" },
+  ],
+  fields: [
+    { name: "title", label: "Título", type: "text", required: true },
+    { name: "slug", label: "Dirección (aldore.co/blog/…)", type: "slug", half: true, help: "Se genera del título si lo dejas vacío." },
+    { name: "publishedAt", label: "Fecha de publicación", type: "date", half: true, help: "Vacía = hoy." },
+    { name: "excerpt", label: "Resumen", type: "textarea", rows: 2, help: "Una o dos frases. Sale en el listado y en Google." },
+    { name: "coverUrl", label: "Imagen de portada (URL)", type: "url", help: "Horizontal, idealmente 1200×630." },
+    {
+      name: "content",
+      label: "Contenido",
+      type: "textarea",
+      rows: 22,
+      required: true,
+      help: "Separa párrafos con una línea en blanco. ## Título, ### Subtítulo, - lista, 1. lista numerada, > cita destacada, **negrita**, *cursiva*, [texto](enlace), ![descripción](url-de-imagen).",
+    },
+    { name: "tags", label: "Etiquetas", type: "text", half: true, help: "Separadas por coma. Ej: Páginas web, Precios" },
+    { name: "author", label: "Autor", type: "text", half: true },
+    { name: "published", label: "Publicado (visible en el sitio)", type: "checkbox" },
+  ],
+  defaults: { author: "Equipo Aldore" },
+  beforeSave(data) {
+    if (!data.publishedAt) data.publishedAt = new Date().toISOString().slice(0, 10);
+    if (!data.author) data.author = "Equipo Aldore";
+  },
+};
+
+const hex = (v: unknown, fallback = "#e2471c") => (/^#[0-9a-fA-F]{3,8}$/.test(String(v || "")) ? String(v) : fallback);
+
+export const QUEUE_RESOURCE: ResourceConfig = {
+  key: "turnos",
+  model: "queue",
+  label: "Turnos con QR",
+  singular: "fila de turnos",
+  description: "Filas de turnos para tus clientes: escanean un QR, toman turno y ven en el celular cuándo les toca.",
+  titleField: "name",
+  sort: [{ createdAt: "desc" }],
+  columns: [
+    { name: "name", label: "Negocio" },
+    { name: "slug", label: "Dirección" },
+    { name: "currentNumber", label: "Turno actual" },
+    { name: "lastNumber", label: "Dados hoy" },
+    { name: "open", label: "Abierta", format: "bool" },
+  ],
+  fields: [
+    { name: "name", label: "Nombre del negocio o la fila", type: "text", required: true, half: true, help: "Ej: Peluquería Ola, Caja 1, Laboratorio" },
+    { name: "slug", label: "Dirección (aldore.co/t/…)", type: "slug", half: true },
+    { name: "subtitle", label: "Texto bajo el nombre", type: "text", half: true, help: "Ej: Envigado · Sin cita previa" },
+    { name: "clientId", label: "Cliente (para tu control)", type: "relation", relation: { model: "client", labelField: "name" }, half: true },
+    { name: "logoUrl", label: "Logo (URL)", type: "url", half: true },
+    { name: "color", label: "Color", type: "text", half: true, help: "Ej: #FF4D6D" },
+    { name: "prefix", label: "Letra del turno", type: "text", half: true, help: "Ej: A → A01, A02…" },
+    { name: "avgMinutes", label: "Minutos promedio por turno", type: "number", half: true, help: "Para calcular la espera aproximada." },
+    { name: "open", label: "Recibiendo turnos", type: "checkbox" },
+    { name: "staffKey", label: "Clave del panel de atención", type: "text", help: "Se crea sola. Bórrala y guarda para generar otra (el enlace anterior deja de funcionar)." },
+  ],
+  defaults: { color: "#e2471c", prefix: "A", avgMinutes: "5", open: "true" },
+  beforeSave(data) {
+    data.color = hex(data.color);
+    data.prefix = String(data.prefix || "A").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 2) || "A";
+    if (!data.avgMinutes) data.avgMinutes = 5;
+    if (!String(data.staffKey || "").trim()) data.staffKey = randomKey();
+  },
+};
+
+export const MENU_RESOURCE: ResourceConfig = {
+  key: "menus",
+  model: "menuBoard",
+  label: "Menú del día",
+  singular: "menú",
+  description: "El almuerzo o menú del día de cada restaurante. El restaurante lo cambia desde el celular con su enlace privado.",
+  titleField: "name",
+  sort: [{ updatedAt: "desc" }],
+  columns: [
+    { name: "name", label: "Restaurante" },
+    { name: "slug", label: "Dirección" },
+    { name: "date", label: "Menú de", format: "date" },
+    { name: "price", label: "Precio" },
+    { name: "published", label: "Publicado", format: "bool" },
+  ],
+  fields: [
+    { name: "name", label: "Nombre del restaurante", type: "text", required: true, half: true },
+    { name: "slug", label: "Dirección (aldore.co/menu/…)", type: "slug", half: true },
+    { name: "subtitle", label: "Texto bajo el nombre", type: "text", half: true, help: "Ej: Laureles · Comida casera" },
+    { name: "clientId", label: "Cliente (para tu control)", type: "relation", relation: { model: "client", labelField: "name" }, half: true },
+    { name: "logoUrl", label: "Logo (URL)", type: "url", half: true },
+    { name: "color", label: "Color", type: "text", half: true },
+    { name: "whatsapp", label: "WhatsApp para pedidos", type: "text", half: true, help: "Con indicativo: +57300…" },
+    { name: "hours", label: "Horario", type: "text", half: true, help: "Ej: Almuerzos de 11:30 a. m. a 3:00 p. m." },
+    { name: "date", label: "Fecha del menú", type: "date", half: true },
+    { name: "price", label: "Precio", type: "text", half: true, help: "Ej: $18.000 · Con jugo y postre" },
+    {
+      name: "items",
+      label: "Menú",
+      type: "textarea",
+      rows: 9,
+      help: "Una línea por plato: Sección | Plato | detalle (opcional). Ej: Sopa | Sancocho de gallina. Una línea con ! al inicio se marca como agotada.",
+    },
+    { name: "notes", label: "Nota", type: "textarea", rows: 2, help: "Ej: Domicilios gratis en Laureles." },
+    { name: "published", label: "Publicado", type: "checkbox" },
+    { name: "staffKey", label: "Clave para editar desde el celular", type: "text", help: "Se crea sola. Bórrala y guarda para generar otra." },
+  ],
+  defaults: {
+    color: "#e2471c",
+    published: "true",
+    items: ["Sopa | Sancocho de gallina", "Principio | Frijoles con garra", "Proteína | Carne asada | o pechuga a la plancha", "Acompañantes | Arroz, maduro, ensalada", "Bebida | Jugo de mora", "Postre | Arroz con leche"].join("\n"),
+  },
+  beforeSave(data) {
+    data.color = hex(data.color);
+    if (!data.date) data.date = new Date().toISOString().slice(0, 10);
+    if (!String(data.staffKey || "").trim()) data.staffKey = randomKey();
+  },
+};
+
+RESOURCES.push(...BUSINESS_RESOURCES, PUERTA_RESOURCE, BLOG_RESOURCE, QUEUE_RESOURCE, MENU_RESOURCE);
 
 /** Etiqueta legible de un valor de select (estado, tipo…). */
 export function optionLabel(res: ResourceConfig, field: string, value: string) {

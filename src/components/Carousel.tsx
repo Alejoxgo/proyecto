@@ -1,5 +1,6 @@
 "use client";
 
+import TC from "@/components/TC";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 export type Slide = { src: string; caption?: string };
@@ -22,6 +23,7 @@ export default function Carousel({
   const track = useRef<HTMLDivElement>(null);
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
+  const [zoom, setZoom] = useState<number | null>(null);
   const n = slides.length;
 
   const go = useCallback(
@@ -51,11 +53,27 @@ export default function Carousel({
   }, []);
 
   useEffect(() => {
-    if (paused || n < 2) return;
+    if (paused || zoom !== null || n < 2) return;
     if (typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const t = setTimeout(() => go(index + 1), interval);
     return () => clearTimeout(t);
-  }, [index, paused, n, interval, go]);
+  }, [index, paused, zoom, n, interval, go]);
+
+  useEffect(() => {
+    if (zoom === null) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setZoom(null);
+      if (e.key === "ArrowRight") setZoom((z) => (z === null ? z : (z + 1) % n));
+      if (e.key === "ArrowLeft") setZoom((z) => (z === null ? z : (z - 1 + n) % n));
+    };
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [zoom, n]);
 
   if (!n) return null;
 
@@ -88,13 +106,22 @@ export default function Carousel({
             aria-roledescription="diapositiva"
             aria-label={`${i + 1} de ${n}`}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={g.src}
-              alt={g.caption || label}
-              loading={i === 0 ? "eager" : "lazy"}
-              className={`aspect-[16/9] w-full rounded-2xl border object-cover object-top ${styles.frame}`}
-            />
+            <button
+              type="button"
+              onClick={() => setZoom(i)}
+              aria-label={`Ampliar: ${g.caption || label}`}
+              className="group relative block w-full cursor-zoom-in"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={g.src}
+                alt={g.caption || label}
+                loading={i === 0 ? "eager" : "lazy"}
+                className={`aspect-[16/9] w-full rounded-2xl border object-cover object-top transition group-hover:brightness-105 ${styles.frame}`}
+              />
+              <span className="pointer-events-none absolute bottom-3 right-3 inline-flex items-center gap-1.5 rounded-full bg-black/55 px-3 py-1.5 text-xs font-medium text-white opacity-0 backdrop-blur transition group-hover:opacity-100 group-focus-visible:opacity-100">
+                <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="6" /><path d="M20 20l-4.5-4.5M11 8v6M8 11h6" /></svg><TC>{"Ampliar"}</TC></span>
+            </button>
             {g.caption && <figcaption className={`mt-4 text-center text-sm sm:text-base ${styles.cap}`}>{g.caption}</figcaption>}
           </figure>
         ))}
@@ -131,6 +158,47 @@ export default function Carousel({
             ))}
           </div>
         </>
+      )}
+      {zoom !== null && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={slides[zoom].caption || label}
+          className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/90 p-3 backdrop-blur-sm sm:p-8"
+          onClick={() => setZoom(null)}
+        >
+          <button
+            type="button"
+            onClick={() => setZoom(null)}
+            aria-label="Cerrar"
+            autoFocus
+            className="absolute right-3 top-3 grid h-11 w-11 place-items-center rounded-full bg-white/10 text-white ring-1 ring-white/20 hover:bg-white/20 sm:right-6 sm:top-6"
+          >
+            <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 6l12 12M18 6L6 18" /></svg>
+          </button>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={slides[zoom].src}
+            alt={slides[zoom].caption || label}
+            className="max-h-[82vh] max-w-full rounded-xl object-contain shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          />
+          <div className="mt-4 flex items-center gap-4 text-white" onClick={(e) => e.stopPropagation()}>
+            {n > 1 && (
+              <button type="button" aria-label="Anterior" onClick={() => setZoom((zoom - 1 + n) % n)} className="grid h-10 w-10 place-items-center rounded-full bg-white/10 ring-1 ring-white/20 hover:bg-white/20">
+                <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 6l-6 6 6 6" /></svg>
+              </button>
+            )}
+            <p className="max-w-[60vw] text-center text-sm text-white/80">
+              {slides[zoom].caption} <span className="ml-2 text-white/50">{zoom + 1} / {n}</span>
+            </p>
+            {n > 1 && (
+              <button type="button" aria-label="Siguiente" onClick={() => setZoom((zoom + 1) % n)} className="grid h-10 w-10 place-items-center rounded-full bg-white/10 ring-1 ring-white/20 hover:bg-white/20">
+                <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 6l6 6-6 6" /></svg>
+              </button>
+            )}
+          </div>
+        </div>
       )}
     </div>
   );

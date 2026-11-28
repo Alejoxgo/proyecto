@@ -21,9 +21,12 @@ type Props = {
   item?: Record<string, any> | null;
   /** Valores iniciales para un registro nuevo (por ejemplo desde la URL). */
   initial?: Record<string, string>;
+  /** A dónde volver al guardar o cancelar (por ejemplo, el espacio de un cliente). */
+  back?: string;
 };
 
-export default async function ResourceForm({ res, item, initial }: Props) {
+export default async function ResourceForm({ res, item, initial, back }: Props) {
+  const backTo = back && /^\/admin\/[\w/?=&-]*$/.test(back) ? back : null;
   const action = saveResource.bind(null, res.key, item?.id ?? null);
   const relations = Object.fromEntries(
     await Promise.all(res.fields.filter((f) => f.type === "relation").map(async (f) => [f.name, await relationOptions(f)] as const)),
@@ -39,7 +42,8 @@ export default async function ResourceForm({ res, item, initial }: Props) {
   };
 
   return (
-    <form action={action} className="grid gap-5 rounded-2xl border border-slate-200 bg-white p-6 sm:grid-cols-2">
+    <form action={action} className="grid gap-5 rounded-2xl border border-black/[0.06] bg-white shadow-[0_1px_2px_rgba(0,0,0,.04)] p-6 sm:grid-cols-2">
+      {backTo && <input type="hidden" name="_back" value={backTo} />}
       {res.fields.map((f) => {
         const value = defaultFor(f);
         const id = `f-${f.name}`;
@@ -107,7 +111,7 @@ export default async function ResourceForm({ res, item, initial }: Props) {
       })}
       <div className="flex gap-3 border-t border-slate-100 pt-5 sm:col-span-2">
         <button className="btn-primary">Guardar</button>
-        <Link href={`/admin/${res.key}`} className="btn-outline">Cancelar</Link>
+        <Link href={backTo || `/admin/${res.key}`} className="btn-outline">Cancelar</Link>
       </div>
     </form>
   );

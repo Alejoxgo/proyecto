@@ -1,4 +1,5 @@
 "use client";
+import TC from "@/components/TC";
 import { useEffect, useState } from "react";
 
 type Line = { kind: "cmd" | "ok" | "info"; text: string };
@@ -41,7 +42,7 @@ export default function Terminal({ script }: { script: Line[] }) {
         <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
         <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
         <span className="h-2.5 w-2.5 rounded-full bg-brand-500" />
-        <span className="ml-3 font-mono text-xs text-paper/40">~/proyectos/tu-empresa</span>
+        <span className="ml-3 font-mono text-xs text-paper/40"><TC>{"~/proyectos/tu-empresa"}</TC></span>
       </div>
       <pre className="min-h-[300px] overflow-x-auto p-5 font-mono text-[13px] leading-7 text-paper/80" aria-label="Ejemplo de flujo de trabajo">
         {visible.map((l, i) => <LineView key={i} l={l} />)}

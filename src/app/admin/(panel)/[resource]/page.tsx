@@ -1,3 +1,4 @@
+import { requireAdmin } from "@/lib/auth";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
@@ -28,6 +29,7 @@ async function relationLabels(res: ResourceConfig) {
 }
 
 export default async function ResourceList({ params, searchParams }: Props) {
+  await requireAdmin();
   const res = getResource((await params).resource);
   if (!res) notFound();
   const { ok, error, estado, q, periodo } = await searchParams;
@@ -55,7 +57,7 @@ export default async function ResourceList({ params, searchParams }: Props) {
     <div>
       <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-ink-900">{res.label}</h1>
+          <h1 className="font-display text-3xl text-ink-900">{res.label}</h1>
           <p className="mt-1 text-sm text-slate-500">{res.description}</p>
         </div>
         <Link href={`/admin/${res.key}/nuevo`} className="btn-primary">+ Nuevo {res.singular}</Link>
@@ -97,7 +99,7 @@ export default async function ResourceList({ params, searchParams }: Props) {
         </div>
       )}
 
-      <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white">
+      <div className="overflow-x-auto rounded-2xl border border-black/[0.06] bg-white shadow-[0_1px_2px_rgba(0,0,0,.04)]">
         <table className="w-full text-left text-sm">
           <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
             <tr>

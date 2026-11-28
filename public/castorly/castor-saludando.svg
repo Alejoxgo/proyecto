@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 250" width="480" height="500" class="cza" role="img" aria-label="Cástor saludando"><style>
+.cza *{transform-box:view-box}
+.cza-sube{transform-origin:120px 248px;animation:cza-sube .9s cubic-bezier(.34,1.56,.64,1) both}
+.cza-cuerpo{transform-origin:120px 246px;animation:cza-respira 3.4s ease-in-out .9s infinite}
+.cza-cabeza{transform-origin:120px 150px;animation:cza-cabeza-entra .9s ease-out both,cza-cabeza 7s ease-in-out .9s infinite}
+.cza-cola{transform-origin:78px 236px;animation:cza-cola 2.6s ease-in-out infinite}
+.cza-pata{transform-origin:156px 184px;animation:cza-saluda 2.2s ease-in-out .5s infinite}
+.cza-ondas{opacity:0;animation:cza-ondas 2.2s ease-in-out .5s infinite}
+.cza-ojos{transform-origin:120px 88px;animation:cza-parpadea 5.2s linear 1.4s infinite}
+.cza-oreja{transform-origin:72px 64px;animation:cza-oreja 9s ease-in-out 3s infinite}
+.cza-luz{animation:cza-luz 2.2s ease-in-out infinite}
+.cza-mejillas{opacity:.5;animation:cza-mejillas 2.2s ease-in-out .5s infinite}
+@keyframes cza-sube{0%{transform:translateY(70px) scale(.7);opacity:0}60%{opacity:1}100%{transform:none;opacity:1}}
+@keyframes cza-respira{50%{transform:scale(1.025,1.035)}}
+@keyframes cza-cabeza-entra{0%{transform:rotate(-10deg)}70%{transform:rotate(5deg)}100%{transform:none}}
+@keyframes cza-cabeza{0%,100%{transform:rotate(0)}30%{transform:rotate(-3deg) translateY(-1px)}60%{transform:rotate(2.5deg)}}
+@keyframes cza-cola{0%,100%{transform:rotate(0)}50%{transform:rotate(7deg)}}
+@keyframes cza-saluda{0%,34%,100%{transform:rotate(0)}5%,15%{transform:rotate(-22deg)}10%,20%{transform:rotate(10deg)}25%{transform:rotate(-18deg)}30%{transform:rotate(4deg)}}
+@keyframes cza-ondas{0%,32%,100%{opacity:0}5%,27%{opacity:.75}}
+@keyframes cza-parpadea{0%,93%,100%{transform:scaleY(1)}95%{transform:scaleY(.08)}97%{transform:scaleY(1)}}
+@keyframes cza-oreja{0%,90%,100%{transform:rotate(0)}93%{transform:rotate(-14deg)}96%{transform:rotate(4deg)}}
+@keyframes cza-luz{50%{fill:#9fd0ff}}
+@keyframes cza-mejillas{0%,34%,100%{opacity:.5}12%,24%{opacity:.85}}
+</style>
+<defs>
+        <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#6FE3FF" />
+          <stop offset=".5" stop-color="#2160F0" />
+          <stop offset="1" stop-color="#7B3DF5" />
+        </linearGradient>
+        <clipPath id="c">
+          <ellipse cx="58" cy="206" rx="22" ry="40" />
+        </clipPath>
+      </defs>
+      <g class="cza-sube">
+        
+          <g class="cza-cola">
+            <g transform="rotate(-38 58 206)">
+              <ellipse cx="58" cy="206" rx="22" ry="40" fill="url(#g)" />
+              <g clip-path="url(#c)" stroke="#fff" stroke-opacity=".35" stroke-width="2">
+                <path d="M20 160 l80 30 M20 190 l80 -30M20 174 l80 30 M20 204 l80 -30M20 188 l80 30 M20 218 l80 -30M20 202 l80 30 M20 232 l80 -30M20 216 l80 30 M20 246 l80 -30M20 230 l80 30 M20 260 l80 -30" />
+              </g>
+              <ellipse cx="50" cy="190" rx="6" ry="14" fill="#fff" opacity=".28" />
+            </g>
+          </g>
+        
+        <g class="cza-cuerpo">
+          <ellipse cx="120" cy="190" rx="52" ry="46" fill="#B97A44" />
+          <ellipse cx="120" cy="200" rx="33" ry="31" fill="#F7E6CC" />
+          <g transform="translate(140 176) rotate(6)">
+            <rect width="22" height="27" rx="5" fill="#fff" stroke="#2160F0" stroke-width="2" />
+            <rect width="22" height="7" rx="3" fill="#2160F0" />
+            <path d="M15.9 12.3 C13.9 10.5 9.9 10.6 8.2 13.3 C6.5 16 7.4 20 11 21.8" fill="none" stroke="#2160F0" stroke-width="2.5" stroke-linecap="round" /><ellipse cx="15.4" cy="21.2" rx="4.6" ry="2.6" transform="rotate(-22 15.4 21.2)" fill="#2160F0" />
+          </g>
+          
+            
+              <ellipse cx="97" cy="238" rx="17" ry="8.5" fill="#8E5629" />
+              <ellipse cx="143" cy="238" rx="17" ry="8.5" fill="#8E5629" />
+              <ellipse cx="94" cy="194" rx="10" ry="12" fill="#8E5629" transform="rotate(20 94 194)" />
+              <g class="cza-pata">
+                <path d="M156 180 Q170 170 176 154" fill="none" stroke="#B97A44" stroke-width="18" stroke-linecap="round" />
+                <ellipse cx="178" cy="150" rx="11" ry="15" fill="#8E5629" transform="rotate(25 178 150)" />
+              </g>
+              <path class="cza-ondas" d="M196 132 q6 8 3 18 M203 124 q9 12 4 28" fill="none" stroke="#6FA8FF" stroke-width="3" stroke-linecap="round" />
+            
+          
+        </g>
+        <g class="cza-cabeza">
+          <g class="cza-oreja">
+            <circle cx="72" cy="56" r="14" fill="#8E5629" />
+            <circle cx="72" cy="56" r="7" fill="#FF8FA3" opacity=".6" />
+          </g>
+          <circle cx="168" cy="56" r="14" fill="#8E5629" />
+          <circle cx="168" cy="56" r="7" fill="#FF8FA3" opacity=".6" />
+          <ellipse cx="120" cy="96" rx="60" ry="52" fill="#B97A44" />
+          <ellipse cx="104" cy="62" rx="22" ry="10" fill="#D59D63" opacity=".55" />
+          <ellipse cx="120" cy="114" rx="31" ry="22" fill="#F7E6CC" />
+          <g class="cza-mejillas">
+            <ellipse cx="80" cy="110" rx="9" ry="6" fill="#FF8FA3" />
+            <ellipse cx="160" cy="110" rx="9" ry="6" fill="#FF8FA3" />
+          </g>
+          <g class="cza-ojos">
+            <circle cx="96" cy="88" r="8.5" fill="#101A3D" />
+            <circle cx="144" cy="88" r="8.5" fill="#101A3D" />
+            <circle cx="93.2" cy="84.8" r="3" fill="#fff" />
+            <circle cx="141.2" cy="84.8" r="3" fill="#fff" />
+          </g>
+          <path d="M106 109 Q113 116 120 109 Q127 116 134 109" fill="none" stroke="#3A2417" stroke-width="3" stroke-linecap="round" />
+          <rect x="112.6" y="111" width="7" height="12" rx="2.4" fill="#fff" stroke="#E2CDAE" stroke-width="1.2" />
+          <rect x="120.4" y="111" width="7" height="12" rx="2.4" fill="#fff" stroke="#E2CDAE" stroke-width="1.2" />
+          <ellipse cx="120" cy="102" rx="11" ry="7" fill="#3A2417" />
+          <ellipse cx="116.5" cy="99.5" rx="3.6" ry="2" fill="#fff" opacity=".5" />
+          <path d="M61 96 C61 26 179 26 179 96" fill="none" stroke="#0D1A4A" stroke-width="8" stroke-linecap="round" />
+          <rect x="49" y="81" width="19" height="31" rx="9.5" fill="#2160F0" />
+          <rect x="53" y="86" width="5" height="14" rx="2.5" fill="#fff" opacity=".45" />
+          <rect x="172" y="81" width="19" height="31" rx="9.5" fill="#2160F0" />
+          <path d="M58 110 C60 136 76 142 92 138" fill="none" stroke="#0D1A4A" stroke-width="4" stroke-linecap="round" />
+          <circle class="cza-luz" cx="94" cy="137.5" r="5.5" fill="#5B9BFF" />
+          
+          
+        </g>
+      </g>
+      </svg>
