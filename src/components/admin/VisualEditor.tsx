@@ -16,6 +16,7 @@ const PAGE_OF: [RegExp, string][] = [
   [/^puerta\./, "/puerta"],
   [/^(contact\.|social\.)/, "/contacto"],
   [/^booking\./, "/agendar"],
+  [/^brand\./, "/marca"],
 ];
 const pageOf = (key: string) => PAGE_OF.find(([r]) => r.test(key))?.[1] ?? "/";
 const PAGES = [
@@ -27,6 +28,7 @@ const PAGES = [
   { href: "/blog", label: "Blog" },
   { href: "/contacto", label: "Contacto" },
   { href: "/agendar", label: "Agendar" },
+  { href: "/marca", label: "Marca" },
 ];
 const DEVICES = { desk: { w: 1280, label: "Escritorio" }, tablet: { w: 820, label: "Tableta" }, phone: { w: 390, label: "Celular" } } as const;
 type Device = keyof typeof DEVICES;

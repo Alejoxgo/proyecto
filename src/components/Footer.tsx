@@ -73,6 +73,7 @@ export default function Footer({ s, services, lang = "es", langs = [] }: { s: Se
                 ["Puerta", "/puerta"],
                 ["Blog", "/blog"],
                 ["Cotizar en línea", "/cotizar"],
+                ["Marca", "/marca"],
               ].map(([label, href]) => (
                 <li key={href}><Link href={href} className="hover:text-paper"><TC>{label}</TC></Link></li>
               ))}

@@ -187,6 +187,16 @@ export const SETTINGS_GROUPS: SettingsGroup[] = [
     ],
   },
   {
+    id: "identidad",
+    title: "Página de marca",
+    description: "Textos de la página /marca (logo, colores, tipografía y voz de Aldore).",
+    fields: [
+      { key: "brand.title", label: "Título", help: "Encierra una palabra entre *asteriscos* para resaltarla.", default: "Una marca que *abre puertas*." },
+      { key: "brand.text", label: "Introducción", type: "textarea", default: "Todo lo que hace que Aldore se vea y suene como Aldore: el logo, los colores, las letras, a Aldo y nuestra forma de hablar. Úsalo para que cada pieza, de una tarjeta a una publicación, se sienta de la misma casa." },
+      { key: "brand.concept", label: "Concepto (frase grande)", type: "textarea", default: "Una A que también es una puerta: la entrada al mundo digital de cada negocio, con una luz encendida adentro." },
+    ],
+  },
+  {
     id: "navidad",
     title: "Árbol de Navidad",
     description: "Sale en Inicio solo cuando está activa la temática de Navidad.",
